@@ -1,0 +1,48 @@
+// Define the keywords to search for in the URLs
+var keywords = [
+  "user-activity-section",   // keyword1
+  "view-logins-section",     // keyword2
+  "s=orders",                // keyword3
+  "s=modules",              // keyword4
+  "s=api-watcher",             // keyword5
+  "s=verified-domains",      // keyword6
+  "s=campaign-templates",    // keyword7
+  "summary-section",         // keyword8
+  "s=regular"                // keyword9
+];
+
+// Get all anchor elements on the page
+var links = document.getElementsByTagName('a');
+
+// Iterate through each keyword in order
+for (var k = 0; k < keywords.length; k++) {
+  var keyword = keywords[k];
+
+  // Iterate through each link
+  for (var i = 0; i < links.length; i++) {
+    var link = links[i];
+
+    // Check if the href attribute matches the keyword
+    // Special condition for keyword3 ("s=orders")
+    if (
+      (keyword === "s=orders" && link.href.includes("s=orders") && !link.href.includes("billing?user_id=")) ||
+      (keyword !== "s=orders" && link.href.includes(keyword))
+    ) {
+      // Log the link being opened
+      console.log("Opening link with keyword " + (k + 1) + ":", link.href);
+
+      // Open the link in a new tab
+      var newTab = window.open(link.href, '_blank');
+
+      // Log any issues with opening the new tab
+      if (!newTab) {
+        console.error("Failed to open link:", link.href);
+      } else {
+        newTab.focus();
+      }
+
+      // Break the loop once the first matching link is found for the current keyword
+      break;
+    }
+  }
+}

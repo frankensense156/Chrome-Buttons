@@ -1,0 +1,111 @@
+// Define the keywords to search for in the URLs
+var keyword1 = "s=regular";
+var keyword2 = "list-activity";
+var keyword3 = "compliance-history";
+var keyword4 = "search-input=";
+var keyword5 = "verified-domains";
+var keyword6 = "s=list-details&user_id=";
+
+// Define the keywords to exclude from the search
+var excludekeyword1 = "list-stats-section";
+
+// Get all anchor elements on the page
+var links = document.getElementsByTagName('a');
+
+// Initialize a flag to track if the keyword6 link has been opened
+var keyword6Clicked = false;
+
+// Iterate through each link
+for (var i = 0; i < links.length; i++) {
+  var link = links[i];
+
+  // Check if the href attribute contains any of the keywords using "or" statements
+  // and does not contain any of the excluded keywords
+  if ((link.href.includes("s=regular") || link.href.includes("list-activity") || link.href.includes("compliance-history") || link.href.includes("search-input=") || link.href.includes("verified-domains") || (link.href.includes("s=list-details&user_id=") && !keyword6Clicked)) &&
+      !link.href.includes("list-stats-section") && !link.href.includes("billing?user_id")) {
+   
+    // Log the link being opened
+    console.log("Opening link:", link.href);
+
+    // Open the link in a new tab
+    var newTab = window.open(link.href, '_blank');
+
+    // Log any issues with opening the new tab
+    if (!newTab) {
+      console.error("Failed to open link:", link.href);
+    } else {
+      newTab.focus();
+    }
+
+    // If the link contains keyword6, set the flag to true
+    if (link.href.includes("s=list-details&user_id=")) {
+      keyword6Clicked = true;
+    }
+  }
+}
+
+// Convert the entire document to a string
+const htmlContent = document.documentElement.innerHTML;
+
+// Find the position of the target text
+const searchText = "Disabled campaign archive for";
+const pos = htmlContent.indexOf(searchText);
+
+if (pos !== -1) {
+    // Extract the substring starting from the target text position
+    const subString = htmlContent.substring(pos);
+   
+    // Find the next anchor tag after the target text
+    const hrefStart = subString.indexOf('href="') + 6; // Adding 6 to move past 'href="'
+    const hrefEnd = subString.indexOf('"', hrefStart);
+  
+    if (hrefStart !== -1 && hrefEnd !== -1) {
+        // Extract the URL from the href attribute
+        let url = subString.substring(hrefStart, hrefEnd);
+       
+        // Find the numeric value following cid=
+        const cidMatch = url.match(/cid=(\d+)/);
+       
+        if (cidMatch) {
+            const cidValue = cidMatch[1]; // Extract the numeric value
+           
+            // Construct the new URL
+            url += `#t:campaign-details-section;id:${cidValue}`;
+           
+            // Open the reconstructed URL in a new tab
+            window.open(url, '_blank');
+        } else {
+            console.log("cid value not found in the URL.");
+        }
+    } else {
+        console.log("Href not found after the target text.");
+    }
+} else {
+    console.log("Target text not found.");
+}
+function findAndOpenTab() {
+    // Find all elements containing text
+    let elements = document.querySelectorAll('*');
+
+    // Iterate through all elements to find the text "Account Website"
+    elements.forEach(element => {
+        if (element.textContent.includes('Account Website')) {
+            // Find the next sibling text node containing the text and punctuation
+            let nextNode = element.nextSibling;
+            while (nextNode) {
+                if (nextNode.nodeType === Node.TEXT_NODE) {
+                    let textWithPunctuation = nextNode.textContent.trim();
+                    if (textWithPunctuation) {
+                        let newUrl = `https://talosintelligence.com/reputation_center/lookup?search=${encodeURIComponent(textWithPunctuation)}`;
+                        window.open(newUrl, '_blank');
+                        return; // Exit function after opening the tab
+                    }
+                }
+                nextNode = nextNode.nextSibling;
+            }
+        }
+    });
+}
+
+// Call the function to execute the task
+findAndOpenTab();
